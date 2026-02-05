@@ -97,8 +97,7 @@ try:
 
     else:
         # --- FICHA INDIVIDUAL ---
-        index_padrao = next((i for i, c in enumerate(colunas_players) if "Damasceno" in c), 0)
-        player_col = st.sidebar.selectbox("Selecione o Jogador:", colunas_players, index=index_padrao)
+        player_col = st.sidebar.selectbox("Selecione o Jogador:", colunas_players, index=0)
         
         # Processamento
         df_games["Categoria"] = df_games[player_col].apply(classificar_status)
@@ -176,3 +175,4 @@ try:
 except Exception as e:
 
     st.error(f"Erro Crítico: {e}")
+
