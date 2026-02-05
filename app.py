@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 import re
+import random
 
+# CONFIGURAR PÁGINA
 st.set_page_config(
     page_title="Alexandria dos Zerados",
     page_icon="🎮",
@@ -15,14 +17,14 @@ st.set_page_config(
     
 st.title("🎮 A Biblioteca de Alexandria (dos Jogos Zerados) 🎮")
 
-# LINK DA PLANILHA
+# LINK PLANILHA
 sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTq--KnMAlHhAwvWQ4mEnapM5P_wdlBYYE5bIk5u_pw5jhYQDvzWZeXbFtoINhnfy6h35tRYxeX2WqJ/pub?gid=0&single=true&output=csv"
 
 @st.cache_data(ttl=60)
 def load_data():
     return pd.read_csv(sheet_url, dtype=str)
 
-# --- FUNÇÕES AUXILIARES ---
+# FUNÇÕES AUXILIARES
 def resolve_imagem(nome_jogo):
     if not isinstance(nome_jogo, str): return None
     nome_limpo = nome_jogo.strip().replace(':', '').replace('?', '').replace('/', '')
@@ -61,7 +63,7 @@ def calcular_nota_0_11(texto):
     if score == 0 and '½' not in t and '☢' not in t: return None
     return score
 
-# --- EU QUERO COMEMORAR, JV !!! ---
+# EU QUERO COMEMORAR JV
 def celebrar_aleatoriamente():
     # Sorteia entre Balões e Neve
     efeito = random.choice([st.balloons, st.snow])
@@ -70,27 +72,32 @@ def celebrar_aleatoriamente():
 try:
     df_raw = load_data()
     
-    # --- CONFIG INICIAL ---
+    # CONFIGURAÇÃO INICIAL
     col_videogames = df_raw.columns[0]
     colunas_players = [c for c in df_raw.columns if "Player" in c]
     if 'Nota' in df_raw.columns: df_raw.rename(columns={'Nota': 'Nota Média'}, inplace=True)
     col_nota_media = 'Nota Média'
 
-    # --- ABA ESTATÍSTICAS (LOBBY) ---
+    # ABA ESTATÍSTICAS (LOBBY)
     df_stats = df_raw.iloc[0:7].copy()
     if "Estatísticas & Capas" in df_stats.columns:
         df_stats.rename(columns={"Estatísticas & Capas": "Estatísticas"}, inplace=True)
         df_stats.loc[0, "Estatísticas"] = "Finalizados"
     df_stats = df_stats[~df_stats["Estatísticas"].astype(str).str.contains("Gráfico", case=False, na=False)]
 
-    # --- LISTA DE JOGOS ---
+    # LISTA DE JOGOS
     df_games = df_raw.iloc[7:].copy() 
     df_games = df_games[df_games[col_videogames].notna() & (df_games[col_videogames] != "")]
 
-    # --- INTERFACE ---
+    # INTERFACE
     st.sidebar.header("Navegação")
     modo = st.sidebar.radio("Escolha a Visão:", ["🏰 Lobby Principal", "👤 Ficha do Jogador"])
 
+    # BOTÃO COMEMORAÇÃO
+    st.sidebar.divider()
+    if st.sidebar.button("🏆 Celebrar Vitória"):
+        celebrar_aleatoriamente()
+    
     if modo == "🏰 Lobby Principal":
         tab1, tab2 = st.tabs(["📊 Estatísticas", "⚔️ Jogador VS Jogador"])
         with tab1:
@@ -103,27 +110,30 @@ try:
             busca = st.text_input("🔍 Buscar:", placeholder="Ex: Metal Gear...")
             cols_pvp = [col_videogames, "Duração", col_nota_media] + colunas_players
             cols_final = [c for c in cols_pvp if c in df_games.columns]
-            
+
+            # CELEBRAÇÃO
             df_show = df_games[cols_final]
             if busca: 
+                celebrar_aleatoriamente()
                 df_show = df_show[df_show[col_videogames].str.contains(busca, case=False, na=False)]
+                
             st.dataframe(df_show, use_container_width=True, hide_index=True)
 
     else:
-        # --- FICHA INDIVIDUAL ---
+        # FICHA INDIVIDUAL
         player_col = st.sidebar.selectbox("Selecione o Jogador:", colunas_players, index=0)
         
-        # Processamento
+        # PROCESSAMENTO
         df_games["Categoria"] = df_games[player_col].apply(classificar_status)
         df_games["Pontos"] = df_games[player_col].apply(calcular_nota_0_11)
         df_games["Visual"] = df_games[col_videogames].apply(resolve_imagem)
 
-        # Filtros
+        # FILTROS
         st.sidebar.divider()
         busca = st.sidebar.text_input("Buscar Jogo:")
         filtro_cat = st.sidebar.multiselect("Filtrar Status:", options=["Zerados", "Pendentes", "Jogando", "Desejados", "Incompletos"])
         
-        # --- FILTRO CONDICIONAL DE NOTA ---
+        # FILTRO CONDICIONAL DE NOTA
         # Só aparece se "Zerados" estiver selecionado no filtro acima
         filtro_nota = []
         if filtro_cat and "Zerados" in filtro_cat:
@@ -137,7 +147,7 @@ try:
         if busca or filtro_cat or filtro_nota:
             celebrar_aleatoriamente()
 
-        # --- MÉTRICAS ---
+        # MÉTRICAS
         counts = df_games["Categoria"].value_counts()
         media = df_games["Pontos"].mean()
         
@@ -147,7 +157,7 @@ try:
         except:
             horas_clean = "-"
 
-        # Painel Superior
+        # PAINEL SUPERIOR
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Acervo Total", len(df_games))
         c2.metric("Zerados", int(counts.get("Zerados", 0)))
@@ -162,19 +172,13 @@ try:
 
         st.divider()
 
-        # --- TABELA FINAL ---
+        # TABELA FINAL
         df_show = df_games.copy()
-        
-        # Aplica Filtros
         if busca: df_show = df_show[df_show[col_videogames].str.contains(busca, case=False, na=False)]
-        
-        # Filtro de Categoria
         if filtro_cat: df_show = df_show[df_show["Categoria"].isin(filtro_cat)]
-        
-        # Filtro de Nota (Novo!)
         if filtro_nota: df_show = df_show[df_show["Pontos"].isin(filtro_nota)]
         
-        # Colunas Ordenadas
+        # COLUNAS ORDENADAS
         cols_ordered = [player_col, col_videogames, "Duração", col_nota_media, "Visual"]
         cols_final_exist = [c for c in cols_ordered if c in df_show.columns]
         
@@ -190,9 +194,4 @@ try:
         )
 
 except Exception as e:
-
     st.error(f"Erro Crítico: {e}")
-
-
-
-
