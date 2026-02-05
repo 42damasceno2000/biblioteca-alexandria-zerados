@@ -11,7 +11,8 @@ st.set_page_config(
     menu_items={
         'About': "É só para se divertir, rapaziada... Simbora Jogar! 😎"
     }
-
+)
+    
 st.title("🎮 A Biblioteca de Alexandria (dos Jogos Zerados) 🎮")
 
 # LINK DA PLANILHA
@@ -188,5 +189,6 @@ try:
 except Exception as e:
 
     st.error(f"Erro Crítico: {e}")
+
 
 
