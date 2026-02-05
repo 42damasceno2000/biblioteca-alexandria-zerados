@@ -131,8 +131,11 @@ try:
             notas_existentes = df_games[df_games["Categoria"] == "Zerados"]["Pontos"].dropna().unique()
             # Ordena do maior (11) para o menor
             notas_ordenadas = sorted(notas_existentes, reverse=True)
-            
             filtro_nota = st.sidebar.multiselect("Filtrar Nota:", options=notas_ordenadas)
+
+        # AUTOMÁTICO: Celebra se qualquer filtro for usado
+        if busca or filtro_cat or filtro_nota:
+            celebrar_aleatoriamente()
 
         # --- MÉTRICAS ---
         counts = df_games["Categoria"].value_counts()
@@ -189,6 +192,7 @@ try:
 except Exception as e:
 
     st.error(f"Erro Crítico: {e}")
+
 
 
 
