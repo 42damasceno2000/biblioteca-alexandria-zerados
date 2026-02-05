@@ -3,7 +3,14 @@ import pandas as pd
 import os
 import re
 
-st.set_page_config(layout="wide", page_title="Biblioteca de Alexandria")
+st.set_page_config(
+    page_title="Alexandria dos Zerados",
+    page_icon="🎮",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': "É só para se divertir, rapaziada... Simbora Jogar! 😎"
+    }
 
 st.title("🎮 A Biblioteca de Alexandria (dos Jogos Zerados) 🎮")
 
@@ -53,6 +60,12 @@ def calcular_nota_0_11(texto):
     if score == 0 and '½' not in t and '☢' not in t: return None
     return score
 
+# --- EU QUERO COMEMORAR, JV !!! ---
+def celebrar_aleatoriamente():
+    # Sorteia entre Balões e Neve
+    efeito = random.choice([st.balloons, st.snow])
+    efeito()
+    
 try:
     df_raw = load_data()
     
@@ -175,4 +188,5 @@ try:
 except Exception as e:
 
     st.error(f"Erro Crítico: {e}")
+
 
