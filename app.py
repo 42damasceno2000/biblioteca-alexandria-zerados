@@ -63,7 +63,7 @@ def calcular_nota_0_11(texto):
     if score == 0 and '½' not in t and '☢' not in t: return None
     return score
 
-# EU QUERO COMEMORAR JV
+# COMEMORAÇÃO
 def celebrar_aleatoriamente():
     # Sorteia entre Balões e Neve
     efeito = random.choice([st.balloons, st.snow])
@@ -92,11 +92,6 @@ try:
     # INTERFACE
     st.sidebar.header("Navegação")
     modo = st.sidebar.radio("Escolha a Visão:", ["🏰 Lobby Principal", "👤 Ficha do Jogador"])
-
-    # BOTÃO COMEMORAÇÃO
-    st.sidebar.divider()
-    if st.sidebar.button("🏆 Celebrar Vitória"):
-        celebrar_aleatoriamente()
     
     if modo == "🏰 Lobby Principal":
         tab1, tab2 = st.tabs(["📊 Estatísticas", "⚔️ Jogador VS Jogador"])
@@ -193,5 +188,11 @@ try:
             }
         )
 
+    # BOTÃO COMEMORAÇÃO
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🤖 Comemoração 🏆"):
+        celebrar_aleatoriamente()
+
 except Exception as e:
     st.error(f"Erro Crítico: {e}")
+
