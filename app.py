@@ -190,9 +190,10 @@ try:
 
     # BOTÃO COMEMORAÇÃO
     st.sidebar.markdown("---")
-    if st.sidebar.button("🤖 Comemoração 🏆"):
+    if st.sidebar.button("Tchêeeeee!!! 🚀"):
         celebrar_aleatoriamente()
 
 except Exception as e:
     st.error(f"Erro Crítico: {e}")
+
 
