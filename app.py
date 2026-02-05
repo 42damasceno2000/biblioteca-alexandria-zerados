@@ -10,7 +10,7 @@ st.title("🎮 A Biblioteca de Alexandria (dos Jogos Zerados) 🎮")
 # LINK DA PLANILHA
 sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTq--KnMAlHhAwvWQ4mEnapM5P_wdlBYYE5bIk5u_pw5jhYQDvzWZeXbFtoINhnfy6h35tRYxeX2WqJ/pub?gid=0&single=true&output=csv"
 
-@st.cache_data
+@st.cache_data(ttl=60)
 def load_data():
     return pd.read_csv(sheet_url, dtype=str)
 
@@ -174,4 +174,5 @@ try:
         )
 
 except Exception as e:
+
     st.error(f"Erro Crítico: {e}")
